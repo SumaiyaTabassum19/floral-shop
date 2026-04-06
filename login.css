@@ -1,0 +1,89 @@
+/* General styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: url('home_1.jpg');
+    /*background: url('log-1.jpg') no-repeat center center/cover;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container */
+.signup-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 40px 35px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    width: 400px;
+    text-align: center;
+}
+
+/* Header */
+.form-box h2 {
+    margin-bottom: 10px;
+    color: #7919ce;
+    font-size: 26px;
+}
+.form-box p {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 25px;
+}
+
+/* Input fields */
+.input-box {
+    position: relative;
+    margin-bottom: 18px;
+}
+.input-box input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    outline: none;
+    transition: 0.3s;
+}
+.input-box input:focus {
+    border-color: #b24ea0;
+    box-shadow: 0 0 5px rgba(178, 78, 160, 0.5);
+}
+.input-box i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+/* Button */
+.btn {
+    width: 100%;
+    background: linear-gradient(135deg, #b24ea0, #f9a8d4);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn:hover {
+    background: linear-gradient(135deg, #9c3f8b, #f78ac7);
+}
+
+/* Login link */
+.login-link {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #333;
+}
+.login-link a {
+    color: #b24ea0;
+    text-decoration: none;
+}
+.login-link a:hover {
+    text-decoration: underline;
+}
