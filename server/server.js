@@ -1,22 +1,42 @@
 const express = require("express");
 const cors = require("cors");
 
+const productRoutes = require("./routes/productRoutes");
+const authRoutes = require("./routes/authRoutes");
+const cartRoutes = require("./routes/cartRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+
 const app = express();
 
-const PORT = 5000;
 
 // Middleware
 app.use(cors());
+
 app.use(express.json());
+
+
+// Routes
+app.use("/api/products", productRoutes);
+
+app.use("/api/auth", authRoutes);
+
+//app.use("/api/cart", cartRoutes);
+
+app.use("/api/orders", orderRoutes);
+
 
 // Test route
 app.get("/", (req, res) => {
     res.json({
-        message: "Floral Shop API is running!"
+        success: true,
+        message: "Flower Canvas API is running"
     });
 });
 
-// Start server
+
+// Server
+const PORT = 5000;
+
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
