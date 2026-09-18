@@ -9,9 +9,9 @@ const router = express.Router();
 const JWT_SECRET = "floral_shop_secret_key";
 
 
-// =============================
+// ========================================
 // REGISTER
-// =============================
+// ========================================
 
 router.post("/register", async (req, res) => {
 
@@ -22,42 +22,67 @@ router.post("/register", async (req, res) => {
             last_name,
             email,
             phone,
-            password
+            password,
+            role
         } = req.body;
 
 
-        // Validate required fields
+        // ================================
+        // VALIDATION
+        // ================================
 
-        if (!first_name || !email || !password) {
+        if (
+            !first_name ||
+            !email ||
+            !password
+        ) {
 
             return res.status(400).json({
+
                 success: false,
-                message: "First name, email and password are required."
+
+                message:
+                    "First name, email and password are required."
+
             });
 
         }
 
 
-        // Check existing user
+        // ================================
+        // VALID ROLE
+        // ================================
 
-        const checkSql = `
-            SELECT id
-            FROM users
-            WHERE email = ?
-        `;
+        const userRole =
+            role === "admin"
+                ? "admin"
+                : "user";
+
+
+        // ================================
+        // CHECK EXISTING USER
+        // ================================
 
         db.query(
-            checkSql,
+            "SELECT id FROM users WHERE email = ?",
             [email],
+
             async (err, results) => {
 
                 if (err) {
 
-                    console.error(err);
+                    console.error(
+                        "Check user error:",
+                        err
+                    );
 
                     return res.status(500).json({
+
                         success: false,
-                        message: "Database error."
+
+                        message:
+                            "Database error."
+
                     });
 
                 }
@@ -66,74 +91,127 @@ router.post("/register", async (req, res) => {
                 if (results.length > 0) {
 
                     return res.status(409).json({
+
                         success: false,
-                        message: "Email already registered."
+
+                        message:
+                            "Email already exists."
+
                     });
 
                 }
 
 
-                // Hash password
+                // ================================
+                // HASH PASSWORD
+                // ================================
 
                 const hashedPassword =
-                    await bcrypt.hash(password, 10);
+                    await bcrypt.hash(
+                        password,
+                        10
+                    );
 
 
-                // Insert user
+                // ================================
+                // INSERT USER
+                // ================================
 
-                const insertSql = `
+                const sql = `
                     INSERT INTO users
-                    (first_name, last_name, email, phone, password)
-                    VALUES (?, ?, ?, ?, ?)
-                `;
-
-                db.query(
-                    insertSql,
-                    [
+                    (
                         first_name,
                         last_name,
                         email,
                         phone,
-                        hashedPassword
+                        password,
+                        role
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?)
+                `;
+
+
+                db.query(
+
+                    sql,
+
+                    [
+                        first_name,
+                        last_name || null,
+                        email,
+                        phone || null,
+                        hashedPassword,
+                        userRole
                     ],
+
                     (err, result) => {
 
                         if (err) {
 
-                            console.error(err);
+                            console.error(
+                                "Register error:",
+                                err
+                            );
 
                             return res.status(500).json({
+
                                 success: false,
-                                message: "Registration failed."
+
+                                message:
+                                    "Registration failed."
+
                             });
 
                         }
 
 
-                        res.status(201).json({
+                        return res.status(201).json({
 
                             success: true,
 
                             message:
-                                "Registration successful!",
+                                "Registration successful.",
 
-                            userId: result.insertId
+                            user: {
+
+                                id: result.insertId,
+
+                                first_name,
+
+                                last_name,
+
+                                email,
+
+                                phone,
+
+                                role: userRole
+
+                            }
 
                         });
 
                     }
+
                 );
 
             }
+
         );
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Register server error:",
+            error
+        );
 
-        res.status(500).json({
+        return res.status(500).json({
+
             success: false,
-            message: "Server error."
+
+            message:
+                "Server error."
+
         });
 
     }
@@ -141,34 +219,75 @@ router.post("/register", async (req, res) => {
 });
 
 
-// =============================
+// ========================================
 // LOGIN
-// =============================
+// ========================================
 
 router.post("/login", (req, res) => {
 
     const {
         email,
-        password
+        password,
+        role
     } = req.body;
 
 
-    if (!email || !password) {
+    // ================================
+    // VALIDATION
+    // ================================
+
+    if (
+        !email ||
+        !password ||
+        !role
+    ) {
 
         return res.status(400).json({
 
             success: false,
 
             message:
-                "Email and password are required."
+                "Email, password and account type are required."
 
         });
 
     }
 
 
+    // ================================
+    // VALID ROLE
+    // ================================
+
+    if (
+        role !== "user" &&
+        role !== "admin"
+    ) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            message:
+                "Invalid account type."
+
+        });
+
+    }
+
+
+    // ================================
+    // FIND USER
+    // ================================
+
     const sql = `
-        SELECT *
+        SELECT
+            id,
+            first_name,
+            last_name,
+            email,
+            phone,
+            password,
+            role
         FROM users
         WHERE email = ?
     `;
@@ -177,11 +296,15 @@ router.post("/login", (req, res) => {
     db.query(
         sql,
         [email],
+
         async (err, results) => {
 
             if (err) {
 
-                console.error(err);
+                console.error(
+                    "Login database error:",
+                    err
+                );
 
                 return res.status(500).json({
 
@@ -212,7 +335,9 @@ router.post("/login", (req, res) => {
             const user = results[0];
 
 
-            // Compare password
+            // ================================
+            // CHECK PASSWORD
+            // ================================
 
             const passwordMatch =
                 await bcrypt.compare(
@@ -235,42 +360,83 @@ router.post("/login", (req, res) => {
             }
 
 
-            // Create JWT
+            // ================================
+            // CHECK SELECTED ROLE
+            // ================================
+
+            if (user.role !== role) {
+
+                return res.status(403).json({
+
+                    success: false,
+
+                    message:
+                        `This account is registered as ${user.role}. Please select ${user.role} login.`
+
+                });
+
+            }
+
+
+            // ================================
+            // CREATE TOKEN
+            // ================================
 
             const token = jwt.sign(
+
                 {
                     id: user.id,
                     email: user.email,
                     role: user.role
                 },
+
                 JWT_SECRET,
+
                 {
                     expiresIn: "1d"
                 }
+
             );
 
 
-            res.json({
+            // ================================
+            // SUCCESS
+            // ================================
+
+            return res.json({
 
                 success: true,
 
                 message:
-                    "Login successful!",
+                    "Login successful.",
 
                 token,
 
                 user: {
+
                     id: user.id,
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    email: user.email,
-                    phone: user.phone,
-                    role: user.role
+
+                    first_name:
+                        user.first_name,
+
+                    last_name:
+                        user.last_name,
+
+                    email:
+                        user.email,
+
+                    phone:
+                        user.phone,
+
+                    role:
+                        user.role
+
                 }
 
             });
 
         }
+
     );
 
 });

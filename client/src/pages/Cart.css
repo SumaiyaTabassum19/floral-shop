@@ -228,6 +228,112 @@
     color: #69736e;
 }
 
+/* ================================
+   STOCK INFORMATION
+================================ */
+
+.cart-stock {
+    margin-bottom: 10px;
+
+    color: #618764;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cart-stock.low-stock {
+    color: #9a6500;
+}
+
+.cart-stock.out-stock {
+    color: #a52a2a;
+}
+
+
+/* ================================
+   STOCK LIMIT MESSAGE
+================================ */
+
+.stock-limit-message {
+    display: block;
+
+    margin-top: 7px;
+
+    color: #9a6500;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ================================
+   DISABLED QUANTITY BUTTON
+================================ */
+
+.quantity-control button:disabled {
+    background: #eeeeee;
+
+    color: #aaaaaa;
+
+    border-color: #dddddd;
+
+    cursor: not-allowed;
+
+    opacity: 0.7;
+}
+
+
+/* ================================
+   OUT OF STOCK CART ITEM
+================================ */
+
+.cart-item-out {
+    border: 1px solid #e5caca;
+}
+
+.cart-item-out img {
+    opacity: 0.65;
+}
+
+
+/* ================================
+   CHECKOUT STOCK WARNING
+================================ */
+
+.checkout-stock-warning {
+    margin-top: 18px;
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    background: #fff4f4;
+
+    border: 1px solid #edcccc;
+
+    color: #a52a2a;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+/* ================================
+   DISABLED CHECKOUT
+================================ */
+
+.checkout-btn:disabled {
+    background: #d6d9d6;
+
+    color: #858985;
+
+    cursor: not-allowed;
+
+    opacity: 0.8;
+}
+
+.checkout-btn:disabled:hover {
+    background: #d6d9d6;
+}
 
 @media (max-width: 800px) {
 

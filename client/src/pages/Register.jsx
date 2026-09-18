@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-import { registerUser } from "../services/api";
-
+import "./Register.css";
 import "./Auth.css";
 
 
@@ -11,19 +10,36 @@ function Register() {
     const navigate = useNavigate();
 
 
-    const [formData, setFormData] = useState({
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        password: ""
-    });
+    const [role, setRole] =
+        useState("user");
 
 
-    const [message, setMessage] = useState("");
+    const [formData, setFormData] =
+        useState({
 
-    const [error, setError] = useState("");
+            first_name: "",
+            last_name: "",
+            email: "",
+            phone: "",
+            password: "",
+            confirm_password: ""
 
+        });
+
+
+    const [error, setError] =
+        useState("");
+
+    const [success, setSuccess] =
+        useState("");
+
+    const [loading, setLoading] =
+        useState(false);
+
+
+    // ================================
+    // INPUT CHANGE
+    // ================================
 
     const handleChange = (e) => {
 
@@ -31,29 +47,121 @@ function Register() {
 
             ...formData,
 
-            [e.target.name]: e.target.value
+            [e.target.name]:
+                e.target.value
 
         });
 
     };
 
 
+    // ================================
+    // REGISTER
+    // ================================
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
-        setMessage("");
         setError("");
+        setSuccess("");
+
+
+        // ================================
+        // PASSWORD CHECK
+        // ================================
+
+        if (
+            formData.password !==
+            formData.confirm_password
+        ) {
+
+            setError(
+                "Passwords do not match."
+            );
+
+            return;
+
+        }
+
+
+        if (formData.password.length < 6) {
+
+            setError(
+                "Password must be at least 6 characters."
+            );
+
+            return;
+
+        }
 
 
         try {
 
-            const result =
-                await registerUser(formData);
+            setLoading(true);
 
 
-            setMessage(result.message);
+            const response =
+                await fetch(
+                    "http://localhost:5000/api/auth/register",
+                    {
+                        method: "POST",
 
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            first_name:
+                                formData.first_name,
+
+                            last_name:
+                                formData.last_name,
+
+                            email:
+                                formData.email,
+
+                            phone:
+                                formData.phone,
+
+                            password:
+                                formData.password,
+
+                            role
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Registration failed."
+                );
+
+            }
+
+
+            setSuccess(
+                `${role === "admin"
+                    ? "Admin"
+                    : "User"
+                } account created successfully!`
+            );
+
+
+            // ================================
+            // GO TO LOGIN
+            // ================================
 
             setTimeout(() => {
 
@@ -64,7 +172,18 @@ function Register() {
 
         } catch (error) {
 
-            setError(error.message);
+            console.error(
+                "Register error:",
+                error
+            );
+
+            setError(
+                error.message
+            );
+
+        } finally {
+
+            setLoading(false);
 
         }
 
@@ -75,12 +194,17 @@ function Register() {
 
         <div className="auth-page">
 
-            <div className="auth-card">
+            <div className="auth-card register-card">
+
+
+                {/* ========================
+                    HEADER
+                ======================== */}
 
                 <div className="auth-header">
 
                     <p>
-                        FLOWER CANVAS
+                        FLORAL CANVAS
                     </p>
 
                     <h1>
@@ -94,95 +218,285 @@ function Register() {
                 </div>
 
 
-                <form onSubmit={handleSubmit}>
+                {/* ========================
+                    ACCOUNT TYPE
+                ======================== */}
 
-                    <div className="input-row">
+                <div className="account-type">
+
+                    <p>
+                        Create account as
+                    </p>
+
+
+                    <div className="role-options">
+
+                        <button
+                            type="button"
+                            className={
+                                role === "user"
+                                    ? "role-option active"
+                                    : "role-option"
+                            }
+                            onClick={() =>
+                                setRole("user")
+                            }
+                        >
+
+                            <span>
+                                👤
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    User
+                                </strong>
+
+                                <small>
+                                    Customer account
+                                </small>
+
+                            </div>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            className={
+                                role === "admin"
+                                    ? "role-option active"
+                                    : "role-option"
+                            }
+                            onClick={() =>
+                                setRole("admin")
+                            }
+                        >
+
+                            <span>
+                                🔐
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Admin
+                                </strong>
+
+                                <small>
+                                    Administrator
+                                </small>
+
+                            </div>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                {/* ========================
+                    ERROR
+                ======================== */}
+
+                {error && (
+
+                    <div className="auth-error">
+                        {error}
+                    </div>
+
+                )}
+
+
+                {success && (
+
+                    <div className="auth-success">
+                        {success}
+                    </div>
+
+                )}
+
+
+                {/* ========================
+                    FORM
+                ======================== */}
+
+                <form
+                    className="auth-form"
+                    onSubmit={handleSubmit}
+                >
+
+                    <div className="form-row">
+
+                        <div className="form-group">
+
+                            <label>
+                                First Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="first_name"
+                                value={
+                                    formData.first_name
+                                }
+                                onChange={
+                                    handleChange
+                                }
+                                placeholder="First name"
+                                required
+                            />
+
+                        </div>
+
+
+                        <div className="form-group">
+
+                            <label>
+                                Last Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="last_name"
+                                value={
+                                    formData.last_name
+                                }
+                                onChange={
+                                    handleChange
+                                }
+                                placeholder="Last name"
+                            />
+
+                        </div>
+
+                    </div>
+
+
+                    <div className="form-group">
+
+                        <label>
+                            Email Address
+                        </label>
 
                         <input
-                            type="text"
-                            name="first_name"
-                            placeholder="First Name"
-                            value={formData.first_name}
-                            onChange={handleChange}
+                            type="email"
+                            name="email"
+                            value={
+                                formData.email
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            placeholder="Enter your email"
                             required
-                        />
-
-                        <input
-                            type="text"
-                            name="last_name"
-                            placeholder="Last Name"
-                            value={formData.last_name}
-                            onChange={handleChange}
                         />
 
                     </div>
 
 
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email Address"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className="form-group">
+
+                        <label>
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={
+                                formData.phone
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            placeholder="01XXXXXXXXX"
+                        />
+
+                    </div>
 
 
-                    <input
-                        type="tel"
-                        name="phone"
-                        placeholder="Phone Number"
-                        value={formData.phone}
-                        onChange={handleChange}
-                    />
+                    <div className="form-group">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            value={
+                                formData.password
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            placeholder="Minimum 6 characters"
+                            required
+                        />
+
+                    </div>
 
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        minLength="6"
-                    />
+                    <div className="form-group">
 
+                        <label>
+                            Confirm Password
+                        </label>
 
-                    {error && (
-                        <p className="auth-error">
-                            {error}
-                        </p>
-                    )}
+                        <input
+                            type="password"
+                            name="confirm_password"
+                            value={
+                                formData.confirm_password
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            placeholder="Confirm password"
+                            required
+                        />
 
-
-                    {message && (
-                        <p className="auth-success">
-                            {message}
-                        </p>
-                    )}
+                    </div>
 
 
                     <button
                         type="submit"
-                        className="auth-btn"
+                        className="auth-submit"
+                        disabled={loading}
                     >
-                        Create Account
+
+                        {loading
+                            ? "Creating Account..."
+                            : `Create ${
+                                role === "admin"
+                                    ? "Admin"
+                                    : "User"
+                            } Account`
+                        }
+
                     </button>
 
                 </form>
 
 
-                <p className="auth-switch">
+                {/* ========================
+                    LOGIN
+                ======================== */}
 
-                    Already have an account?
+                <div className="auth-footer">
 
-                    {" "}
+                    <span>
+                        Already have an account?
+                    </span>
 
                     <Link to="/login">
                         Login
                     </Link>
 
-                </p>
+                </div>
 
             </div>
 

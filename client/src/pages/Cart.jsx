@@ -1,20 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 import { useCart } from "../context/CartContext";
-import { useNavigate } from "react-router-dom";
+
 import "./Cart.css";
 
 
 function Cart() {
+
     const navigate = useNavigate();
+
 
     const {
         cart,
         cartTotal,
         increaseQuantity,
         decreaseQuantity,
-        removeFromCart
+        removeFromCart,
+        canCheckout
     } = useCart();
 
+
+    // =============================
+    // EMPTY CART
+    // =============================
 
     if (cart.length === 0) {
 
@@ -44,6 +52,21 @@ function Cart() {
     }
 
 
+    // =============================
+    // CHECKOUT
+    // =============================
+
+    const handleCheckout = () => {
+
+        if (!canCheckout) {
+            return;
+        }
+
+        navigate("/checkout");
+
+    };
+
+
     return (
 
         <div className="cart-page">
@@ -63,94 +86,186 @@ function Cart() {
 
             <div className="cart-container">
 
+
+                {/* =========================
+                    CART ITEMS
+                ========================= */}
+
                 <div className="cart-items">
 
-                    {cart.map((item) => (
+                    {cart.map((item) => {
 
-                        <div
-                            className="cart-item"
-                            key={item.id}
-                        >
+                        const stock =
+                            Number(
+                                item.stock || 0
+                            );
 
-                            <img
-                                src={item.image}
-                                alt={item.name}
-                            />
+                        const isOutOfStock =
+                            stock <= 0;
 
-
-                            <div className="cart-item-info">
-
-                                <h3>
-                                    {item.name}
-                                </h3>
-
-                                <p>
-                                    ৳ {Number(item.price).toFixed(2)}
-                                </p>
+                        const isAtStockLimit =
+                            item.quantity >= stock;
 
 
-                                <div className="quantity-control">
+                        return (
+
+                            <div
+                                className={`cart-item ${
+                                    isOutOfStock
+                                        ? "cart-item-out"
+                                        : ""
+                                }`}
+                                key={item.id}
+                            >
+
+
+                                {/* IMAGE */}
+
+                                <img
+                                    src={item.image}
+                                    alt={item.name}
+                                />
+
+
+                                {/* PRODUCT INFO */}
+
+                                <div className="cart-item-info">
+
+                                    <h3>
+                                        {item.name}
+                                    </h3>
+
+                                    <p>
+                                        ৳ {Number(
+                                            item.price
+                                        ).toFixed(2)}
+                                    </p>
+
+
+                                    {/* STOCK */}
+
+                                    {isOutOfStock ? (
+
+                                        <div className="cart-stock out-stock">
+                                            Out of Stock
+                                        </div>
+
+                                    ) : (
+
+                                        <div
+                                            className={`cart-stock ${
+                                                stock <= 5
+                                                    ? "low-stock"
+                                                    : ""
+                                            }`}
+                                        >
+                                            {stock} available
+                                        </div>
+
+                                    )}
+
+
+                                    {/* QUANTITY */}
+
+                                    <div className="quantity-control">
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                decreaseQuantity(
+                                                    item.id
+                                                )
+                                            }
+                                        >
+                                            −
+                                        </button>
+
+
+                                        <span>
+                                            {item.quantity}
+                                        </span>
+
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                increaseQuantity(
+                                                    item.id
+                                                )
+                                            }
+                                            disabled={
+                                                isOutOfStock ||
+                                                isAtStockLimit
+                                            }
+                                            title={
+                                                isAtStockLimit
+                                                    ? "Maximum available stock reached"
+                                                    : "Increase quantity"
+                                            }
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+
+                                    {/* STOCK WARNING */}
+
+                                    {isAtStockLimit &&
+                                    !isOutOfStock ? (
+
+                                        <small className="stock-limit-message">
+                                            Maximum available
+                                            quantity reached
+                                        </small>
+
+                                    ) : null}
+
+                                </div>
+
+
+                                {/* RIGHT SIDE */}
+
+                                <div className="cart-item-right">
+
+                                    <strong>
+                                        ৳ {
+                                            (
+                                                Number(
+                                                    item.price
+                                                ) *
+                                                item.quantity
+                                            ).toFixed(2)
+                                        }
+                                    </strong>
+
 
                                     <button
+                                        type="button"
+                                        className="remove-btn"
                                         onClick={() =>
-                                            decreaseQuantity(
+                                            removeFromCart(
                                                 item.id
                                             )
                                         }
                                     >
-                                        −
-                                    </button>
-
-                                    <span>
-                                        {item.quantity}
-                                    </span>
-
-                                    <button
-                                        onClick={() =>
-                                            increaseQuantity(
-                                                item.id
-                                            )
-                                        }
-                                    >
-                                        +
+                                        Remove
                                     </button>
 
                                 </div>
 
                             </div>
 
+                        );
 
-                            <div className="cart-item-right">
-
-                                <strong>
-                                    ৳ {
-                                        (
-                                            Number(item.price) *
-                                            item.quantity
-                                        ).toFixed(2)
-                                    }
-                                </strong>
-
-
-                                <button
-                                    className="remove-btn"
-                                    onClick={() =>
-                                        removeFromCart(
-                                            item.id
-                                        )
-                                    }
-                                >
-                                    Remove
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    ))}
+                    })}
 
                 </div>
 
+
+                {/* =========================
+                    ORDER SUMMARY
+                ========================= */}
 
                 <div className="cart-summary">
 
@@ -201,14 +316,33 @@ function Cart() {
                     </div>
 
 
-                    {/* <button className="checkout-btn">
-                        Proceed to Checkout
-                    </button> */}
+                    {/* STOCK WARNING */}
+
+                    {!canCheckout && (
+
+                        <div className="checkout-stock-warning">
+
+                            Some products in your cart
+                            are unavailable or exceed
+                            the available stock.
+
+                        </div>
+
+                    )}
+
+
+                    {/* CHECKOUT BUTTON */}
+
                     <button
+                        type="button"
                         className="checkout-btn"
-                        onClick={() => navigate("/checkout")}
+                        onClick={handleCheckout}
+                        disabled={!canCheckout}
                     >
-                        Proceed to Checkout
+                        {canCheckout
+                            ? "Proceed to Checkout"
+                            : "Stock Unavailable"
+                        }
                     </button>
 
 

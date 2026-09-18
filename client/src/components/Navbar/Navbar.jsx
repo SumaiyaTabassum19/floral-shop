@@ -1,41 +1,50 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
+
 import "./Navbar.css";
+
 
 function Navbar() {
 
     const navigate = useNavigate();
+
     const { cartCount } = useCart();
 
-    // Mobile menu state
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const { user, token, logout } = useAuth();
+    const {
+        user,
+        token,
+        logout
+    } = useAuth();
+
+
+    // =============================
+    // LOGOUT
+    // =============================
 
     const handleLogout = () => {
 
         logout();
 
+        setMenuOpen(false);
+
         navigate("/");
 
     };
 
-    // Check login
-    // const token = localStorage.getItem("token");
-    // const user = JSON.parse(localStorage.getItem("user"));
 
+    // =============================
+    // CLOSE MOBILE MENU
+    // =============================
 
-    // Logout
-    //const handleLogout = () => {
+    const closeMenu = () => {
+        setMenuOpen(false);
+    };
 
-    //localStorage.removeItem("token");
-    //localStorage.removeItem("user");
-
-    //navigate("/");
-
-    //};
 
     return (
 
@@ -43,11 +52,24 @@ function Navbar() {
 
             <div className="nav-container">
 
-                <a href="#home" className="logo">
+
+                {/* =========================
+                    LOGO
+                ========================= */}
+
+                <Link
+                    to="/"
+                    className="logo"
+                    onClick={closeMenu}
+                >
                     <span>FLoral</span>
                     <small>CANVAS</small>
-                </a>
+                </Link>
 
+
+                {/* =========================
+                    MAIN NAVIGATION
+                ========================= */}
 
                 <nav
                     className={
@@ -57,44 +79,49 @@ function Navbar() {
                     }
                 >
 
-                    <a
-                        href="#home"
-                        onClick={() => setMenuOpen(false)}
+                    <Link
+                        to="/"
+                        onClick={closeMenu}
                     >
                         Home
-                    </a>
+                    </Link>
+
 
                     <a
-                        href="#about"
-                        onClick={() => setMenuOpen(false)}
+                        href="/#about"
+                        onClick={closeMenu}
                     >
                         About
                     </a>
 
+
                     <a
-                        href="#products"
-                        onClick={() => setMenuOpen(false)}
+                        href="/#products"
+                        onClick={closeMenu}
                     >
                         Products
                     </a>
 
+
                     <a
-                        href="#blogs"
-                        onClick={() => setMenuOpen(false)}
+                        href="/#blogs"
+                        onClick={closeMenu}
                     >
                         Blogs
                     </a>
 
+
                     <a
-                        href="#reviews"
-                        onClick={() => setMenuOpen(false)}
+                        href="/#reviews"
+                        onClick={closeMenu}
                     >
                         Reviews
                     </a>
 
+
                     <a
-                        href="#contact"
-                        onClick={() => setMenuOpen(false)}
+                        href="/#contact"
+                        onClick={closeMenu}
                     >
                         Contact
                     </a>
@@ -102,83 +129,113 @@ function Navbar() {
                 </nav>
 
 
+                {/* =========================
+                    NAV ACTIONS
+                ========================= */}
+
                 <div className="nav-actions">
+
+
+                    {/* Search */}
 
                     <button
                         className="icon-btn"
                         title="Search"
+                        type="button"
                     >
                         🔍
                     </button>
 
 
+                    {/* Wishlist */}
+
                     <button
                         className="icon-btn"
                         title="Wishlist"
+                        type="button"
                     >
                         ♡
                     </button>
 
 
+                    {/* Cart */}
+
                     <button
                         className="icon-btn cart-btn"
                         title="Cart"
-                        onClick={() => navigate("/cart")}
+                        type="button"
+                        onClick={() =>
+                            navigate("/cart")
+                        }
                     >
+
                         🛒
-                        <span>{cartCount}</span>
+
+                        <span>
+                            {cartCount}
+                        </span>
+
                     </button>
 
 
-                    {/* Login / Logout */}
+                    {/* =========================
+                        AUTHENTICATION
+                    ========================= */}
 
                     {token ? (
 
                         <>
+
                             <span className="nav-user">
                                 {user?.first_name}
                             </span>
 
+
                             <button
                                 className="logout-btn"
+                                type="button"
                                 onClick={handleLogout}
                             >
                                 Logout
                             </button>
+
+
+                            {/* My Orders */}
+
+                            <Link
+                                to="/my-orders"
+                                className="my-orders-btn"
+                                onClick={closeMenu}
+                            >
+                                My Orders
+                            </Link>
+
                         </>
 
                     ) : (
 
-                        <a
-                            href="/login"
+                        <Link
+                            to="/login"
                             className="login-btn"
+                            onClick={closeMenu}
                         >
                             Login
-                        </a>
+                        </Link>
 
                     )}
 
 
+                    {/* Mobile menu */}
+
                     <button
                         className="menu-btn"
+                        type="button"
                         onClick={() =>
                             setMenuOpen(!menuOpen)
                         }
                     >
                         ☰
                     </button>
-
-                    {
-                        token && (
-
-                            <a
-                                href="/my-orders"
-                                className="my-orders-btn"
-                            >
-                                My Orders
-                            </a>
-                        )
-                    }
 
                 </div>
 
@@ -189,5 +246,6 @@ function Navbar() {
     );
 
 }
+
 
 export default Navbar;

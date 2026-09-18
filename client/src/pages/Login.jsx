@@ -1,35 +1,60 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-import { loginUser } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+
+import "./Login.css";
 import "./Auth.css";
 
 
 function Login() {
 
     const navigate = useNavigate();
+
     const { login } = useAuth();
 
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    });
 
-    const [error, setError] = useState("");
+    const [role, setRole] =
+        useState("user");
 
-    const [loading, setLoading] = useState(false);
 
+    const [formData, setFormData] =
+        useState({
+
+            email: "",
+            password: ""
+
+        });
+
+
+    const [error, setError] =
+        useState("");
+
+    const [loading, setLoading] =
+        useState(false);
+
+
+    // ================================
+    // INPUT CHANGE
+    // ================================
 
     const handleChange = (e) => {
 
         setFormData({
+
             ...formData,
-            [e.target.name]: e.target.value
+
+            [e.target.name]:
+                e.target.value
+
         });
 
     };
 
+
+    // ================================
+    // LOGIN
+    // ================================
 
     const handleSubmit = async (e) => {
 
@@ -42,32 +67,82 @@ function Login() {
 
         try {
 
-            const data = await loginUser(formData);
+            const response =
+                await fetch(
+                    "http://localhost:5000/api/auth/login",
+                    {
+                        method: "POST",
 
-            login(data.token, data.user);
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            email:
+                                formData.email,
+
+                            password:
+                                formData.password,
+
+                            role
+
+                        })
+
+                    }
+                );
 
 
-            // // Save token
-            // localStorage.setItem(
-            //     "token",
-            //     data.token
-            // );
+            const data =
+                await response.json();
 
 
-            // // Save user
-            // localStorage.setItem(
-            //     "user",
-            //     JSON.stringify(data.user)
-            // );
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Login failed."
+                );
+
+            }
 
 
-            // Go to home
-            navigate("/");
+            // ================================
+            // SAVE AUTH
+            // ================================
+
+            login(
+                data.user,
+                data.token
+            );
+
+
+            // ================================
+            // REDIRECT
+            // ================================
+
+            if (data.user.role === "admin") {
+
+                navigate("/admin");
+
+            } else {
+
+                navigate("/");
+
+            }
 
 
         } catch (error) {
 
-            setError(error.message);
+            console.error(
+                "Login error:",
+                error
+            );
+
+            setError(
+                error.message
+            );
 
         } finally {
 
@@ -84,10 +159,15 @@ function Login() {
 
             <div className="auth-card">
 
+
+                {/* ========================
+                    HEADER
+                ======================== */}
+
                 <div className="auth-header">
 
                     <p>
-                        FLOWER CANVAS
+                        FLORAL CANVAS
                     </p>
 
                     <h1>
@@ -95,52 +175,170 @@ function Login() {
                     </h1>
 
                     <span>
-                        Login to continue shopping
+                        Login to your account
                     </span>
 
                 </div>
 
 
-                <form onSubmit={handleSubmit}>
+                {/* ========================
+                    ACCOUNT TYPE
+                ======================== */}
 
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email Address"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
+                <div className="account-type">
 
-
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
+                    <p>
+                        Login as
+                    </p>
 
 
-                    {error && (
+                    <div className="role-options">
 
-                        <p className="auth-error">
-                            {error}
-                        </p>
+                        <button
+                            type="button"
+                            className={
+                                role === "user"
+                                    ? "role-option active"
+                                    : "role-option"
+                            }
+                            onClick={() =>
+                                setRole("user")
+                            }
+                        >
 
-                    )}
+                            <span>
+                                👤
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    User
+                                </strong>
+
+                                <small>
+                                    Customer account
+                                </small>
+
+                            </div>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            className={
+                                role === "admin"
+                                    ? "role-option active"
+                                    : "role-option"
+                            }
+                            onClick={() =>
+                                setRole("admin")
+                            }
+                        >
+
+                            <span>
+                                🔐
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Admin
+                                </strong>
+
+                                <small>
+                                    Administrator
+                                </small>
+
+                            </div>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                {/* ========================
+                    ERROR
+                ======================== */}
+
+                {error && (
+
+                    <div className="auth-error">
+                        {error}
+                    </div>
+
+                )}
+
+
+                {/* ========================
+                    FORM
+                ======================== */}
+
+                <form
+                    onSubmit={handleSubmit}
+                    className="auth-form"
+                >
+
+                    <div className="form-group">
+
+                        <label>
+                            Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            value={
+                                formData.email
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            placeholder="Enter your email"
+                            required
+                        />
+
+                    </div>
+
+
+                    <div className="form-group">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            value={
+                                formData.password
+                            }
+                            onChange={
+                                handleChange
+                            }
+                            placeholder="Enter your password"
+                            required
+                        />
+
+                    </div>
 
 
                     <button
                         type="submit"
-                        className="auth-btn"
+                        className="auth-submit"
                         disabled={loading}
                     >
 
                         {loading
                             ? "Logging in..."
-                            : "Login"
+                            : `Login as ${
+                                role === "admin"
+                                    ? "Admin"
+                                    : "User"
+                            }`
                         }
 
                     </button>
@@ -148,17 +346,21 @@ function Login() {
                 </form>
 
 
-                <p className="auth-switch">
+                {/* ========================
+                    SIGN UP
+                ======================== */}
 
-                    Don't have an account?
+                <div className="auth-footer">
 
-                    {" "}
+                    <span>
+                        Don't have an account?
+                    </span>
 
                     <Link to="/register">
                         Create Account
                     </Link>
 
-                </p>
+                </div>
 
             </div>
 

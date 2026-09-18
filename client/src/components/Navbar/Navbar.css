@@ -297,6 +297,48 @@
         0 4px 10px rgba(43, 87, 72, 0.15);
 }
 
+/* =========================
+   MY ORDERS BUTTON
+========================= */
+
+.my-orders-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 9px 15px;
+
+    border: 1px solid #2b5748;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #2b5748 !important;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none !important;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+}
+
+
+.my-orders-btn:hover {
+    background: #2b5748;
+
+    color: #ffffff !important;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(43, 87, 72, 0.15);
+}
+
 @media (max-width: 768px) {
 
     .nav-links.active {

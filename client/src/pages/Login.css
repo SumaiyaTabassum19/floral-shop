@@ -1,0 +1,143 @@
+/* =================================
+   ACCOUNT TYPE
+================================= */
+
+.account-type {
+    margin-bottom: 22px;
+}
+
+.account-type > p {
+    margin: 0 0 10px;
+
+    color: #273b32;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.role-options {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+}
+
+
+.role-option {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 13px;
+
+    border: 1px solid #dce2db;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #273b32;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+}
+
+
+.role-option:hover {
+    border-color: #618764;
+
+    background: #f7f9f4;
+}
+
+
+.role-option.active {
+    border-color: #2b5748;
+
+    background: #eef3ea;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(43, 87, 72, 0.08);
+}
+
+
+.role-option > span {
+    font-size: 22px;
+}
+
+
+.role-option div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.role-option strong {
+    color: #273b32;
+
+    font-size: 13px;
+}
+
+
+.role-option small {
+    color: #7b837f;
+
+    font-size: 10px;
+}
+
+
+/* =================================
+   ERROR / SUCCESS
+================================= */
+
+.auth-error {
+    margin-bottom: 18px;
+
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    background: #f8e4e4;
+
+    border: 1px solid #edcccc;
+
+    color: #8a4545;
+
+    font-size: 13px;
+}
+
+
+.auth-success {
+    margin-bottom: 18px;
+
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    background: #e5f1e4;
+
+    border: 1px solid #c9dfc8;
+
+    color: #426746;
+
+    font-size: 13px;
+}
+
+
+@media (max-width: 500px) {
+
+    .role-options {
+        grid-template-columns: 1fr;
+    }
+
+}
