@@ -108,15 +108,14 @@ function Login() {
             }
 
 
-            // ================================
+            /// ================================
             // SAVE AUTH
             // ================================
 
             login(
-                data.user,
-                data.token
+                data.token,
+                data.user
             );
-
 
             // ================================
             // REDIRECT
@@ -131,7 +130,6 @@ function Login() {
                 navigate("/");
 
             }
-
 
         } catch (error) {
 
@@ -334,10 +332,9 @@ function Login() {
 
                         {loading
                             ? "Logging in..."
-                            : `Login as ${
-                                role === "admin"
-                                    ? "Admin"
-                                    : "User"
+                            : `Login as ${role === "admin"
+                                ? "Admin"
+                                : "User"
                             }`
                         }
 

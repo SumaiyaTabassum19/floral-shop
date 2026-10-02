@@ -13,6 +13,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import MyOrders from "./pages/MyOrders";
 import Checkout from "./pages/Checkout";
 import AdminProducts from "./pages/AdminProducts";
+import Contact from "./pages/Contact";
+import Blogs from "./pages/Blogs";
+import Reviews from "./pages/Reviews";
 
 import AdminRoute from "./components/AdminRoute";
 
@@ -88,6 +91,21 @@ function App() {
                             />
 
                         </Route>
+
+                        <Route
+                            path="/contact"
+                            element={<Contact />}
+                        />
+
+                        <Route
+                            path="/blogs"
+                            element={<Blogs />}
+                        />
+
+                        <Route
+                            path="/reviews"
+                            element={<Reviews />}
+                        />
 
                     </Routes>
 

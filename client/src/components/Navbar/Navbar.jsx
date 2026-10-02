@@ -93,8 +93,7 @@ function Navbar() {
                     >
                         About
                     </a>
-
-
+                    
                     <a
                         href="/#products"
                         onClick={closeMenu}
@@ -102,29 +101,28 @@ function Navbar() {
                         Products
                     </a>
 
-
-                    <a
-                        href="/#blogs"
+                    <Link
+                        to="/blogs"
                         onClick={closeMenu}
                     >
                         Blogs
-                    </a>
+                    </Link>
 
 
-                    <a
-                        href="/#reviews"
+                    <Link
+                        to="/reviews"
                         onClick={closeMenu}
                     >
                         Reviews
-                    </a>
+                    </Link>
 
 
-                    <a
-                        href="/#contact"
+                    <Link
+                        to="/contact"
                         onClick={closeMenu}
                     >
                         Contact
-                    </a>
+                    </Link>
 
                 </nav>
 
